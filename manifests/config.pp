@@ -84,13 +84,16 @@ class prometheus::config(
     purge   => $purge,
     recurse => $purge,
   }
-  -> file { 'prometheus.yaml':
-    ensure  => present,
-    path    => "${prometheus::config_dir}/prometheus.yaml",
-    owner   => $prometheus::user,
-    group   => $prometheus::group,
-    mode    => $prometheus::config_mode,
-    content => template($config_template),
-  }
 
+  if $prometheus::manage_config {
+    file { 'prometheus.yaml':
+      ensure  => present,
+      path    => "${prometheus::config_dir}/prometheus.yaml",
+      owner   => $prometheus::user,
+      group   => $prometheus::group,
+      mode    => $prometheus::config_mode,
+      content => template($config_template),
+      require => File[$prometheus::config_dir],
+    }
+  }
 }
